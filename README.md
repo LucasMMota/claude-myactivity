@@ -255,4 +255,4 @@ flow. Until then, the `Setup` commands describe the target experience.
 
 ## License
 
-*TBD.*
+[MIT](LICENSE) © 2026 Lucas Fonseca.
