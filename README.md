@@ -1,4 +1,4 @@
-# claude-myactivity
+# Claude MyActivity
 
 > **TL;DR** — Claude Code is a powerful *foundation*, but managing many sessions in
 > it is painful: sessions are ephemeral, their files scatter, and reopening a past
