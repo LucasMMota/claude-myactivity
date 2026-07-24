@@ -1,59 +1,70 @@
 # claude-myactivity
 
-> **TL;DR** — A Claude Code plugin that gives **every conversation a persistent
-> workspace folder on disk**, with automatic lineage, one-click resume, forking
-> into nested sub-sessions, and monthly auto-archiving. Think *"project structure
-> + git-style branching for your AI chats."*
+> **TL;DR** — Claude Code is a powerful *foundation*, but managing many sessions in
+> it is painful: sessions are ephemeral, their files scatter, and reopening a past
+> conversation means starting from scratch. **claude-myactivity is a layer on top —
+> almost an operating system over Claude Code — that makes session management easy
+> and guarantees a fast context bootstrap: reopen any conversation, right where you
+> left it, with all its files in one place.** It's a productivity tool.
 
 ---
 
-## What is this?
+## The problem
 
-Claude Code sessions are ephemeral and hard to find again. You don't know where a
-conversation's artifacts ended up, you can't reopen *that specific session* without
-hunting for its id, and there's no relationship between a chat and the ones that
-grew out of it. Your history becomes a pile of anonymous `.jsonl` files.
+Claude Code is excellent at the core task. But the surface around *managing your
+work across sessions* is thin, and it hurts in predictable ways:
 
-**claude-myactivity** fixes that. Every session gets its **own folder** (under
-`MyActivity/`) tied to its session id by a marker file. From then on, the folder is
-the conversation's *home*: it holds the artifacts, knows how to reopen itself, and
-knows how to branch.
+- **Sessions are ephemeral.** They pile up as anonymous transcripts and become hard
+  to manage — you can't easily tell them apart, group them, or find them again.
+- **Session files get lost.** Artifacts you generate during a chat (scripts, SQL,
+  notes, docs) end up scattered with no home, hard to track down later.
+- **The recurring questions:** *"Where is that file I made?"* · *"How do I get the
+  context of that session back?"* — and when you can't, you **start everything over**,
+  which is slow and costly.
 
-It is **workflow infrastructure**, not a domain tool — there's nothing about any
-specific company or subject in it. Anyone who lives inside Claude Code can use it.
+## What it is
+
+Claude Code is the **foundation** — very capable, but not always a friendly
+*product* for day-to-day session management. **claude-myactivity is the layer built
+on top of it**: an abstraction — think a lightweight *operating system over Claude
+Code* — whose whole job is to make sessions easy to manage and, above all, to
+**bootstrap context fast** (get a past conversation back in seconds instead of
+rebuilding it).
 
 ## What it gives you
 
-- **A folder per session** — created automatically at session start (via a
-  `SessionStart` hook) and re-found by its marker even if you rename or move the
-  folder later.
-- **Resume with one click** — each folder gets a `resume.sh` that opens a
-  positioned iTerm window and runs `claude --resume` for that session (by id, and
-  by the folder's alias/name).
-- **Fork into a sub-session** — each folder gets a `fork.sh` that spawns a *child*
-  conversation **inside** the parent's folder: full history preserved, its own new
-  id. Forks nest recursively, forming a lineage tree of your conversations.
-- **Automatic tidying** — a prune script deletes empty session folders and archives
-  the rest into monthly buckets (`Work/YYYY-MM/`), keeping today's sessions loose
-  and at hand.
-- **Readable naming** — human alias in the folder name, matching iTerm tab title,
-  and an optional ticket-id prefix (e.g. a Jira key) turned on during setup.
+- **Recover any session — even closed ones.** Reopen a conversation and pick up
+  exactly where you left off; go back to a point in time instead of restarting.
+- **All of a conversation's files in one place.** Every session gets its own folder
+  that collects its artifacts, so nothing gets lost.
+- **Pre-created agents.** Persistent "agents" that you open straight from their
+  folder — under the hood they're just session folders parked at the root, ready to
+  resume with one click.
+- **Housekeeping built in.** A `prune` command tidies up (removes empty folders,
+  archives the rest into monthly buckets), plus several internal commands to help
+  you manage sessions day to day.
+- **Fast, one-click resume & fork.** Each folder ships helper scripts that reopen
+  the session (by id or name) in a new terminal, or *fork* it into a nested child
+  conversation — forming a navigable lineage of your work.
+
+Net effect: a **productivity tool** that turns a pile of ephemeral transcripts into
+a browsable, resumable workspace.
 
 ## Who is this for?
 
 Heavy Claude Code users — individuals or team leads — who juggle many parallel
-conversations and want **traceability, quick resume, and a browsable history**
-without any manual bookkeeping. If you routinely think *"where did that chat go?"*
-or *"let me branch this conversation and try another approach,"* this is for you.
+conversations and want **traceability, instant resume, and a browsable history**
+without manual bookkeeping. If you regularly think *"where did that chat go?"* or
+*"let me get that session's context back,"* this is for you.
 
 ## How it works (in one breath)
 
-A `SessionStart` hook creates/re-finds the session folder and drops helper scripts
-into it. `resume.sh` and `fork.sh` are self-contained (they discover the project
-root and session id at runtime), so folders can be renamed, promoted, or moved
-freely. A prune command handles housekeeping. Everything keys off a per-folder
-marker file named after the full session id — that's the durable link between a
-folder on disk and a conversation in Claude Code.
+A `SessionStart` hook gives each session its own folder (under `MyActivity/`), tied
+to the session id by a marker file, and drops self-contained helper scripts into it.
+Those helpers discover the project and session id at runtime, so folders can be
+renamed, promoted to the root (as reusable "agents"), or archived freely — the
+marker keeps the link between a folder on disk and a conversation in Claude Code.
+Internal commands handle resume, fork, prune/archive, and navigation.
 
 ## Requirements
 
