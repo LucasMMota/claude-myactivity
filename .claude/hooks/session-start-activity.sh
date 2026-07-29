@@ -97,7 +97,7 @@ else
   # A brand-new session lands in Work/. (Forks are created deterministically by
   # fork.sh, which pre-creates the nested folder with the chosen id; when Claude
   # boots, the marker lookup above finds it and takes the "existing" branch.)
-  SESSION_FOLDER="${WORK_DIR}/${SHORT_ID} - ${DATE}"
+  SESSION_FOLDER="${WORK_DIR}/${DATE} - ${SHORT_ID}"
   mkdir -p "$SESSION_FOLDER"
   # Empty marker file named after the full session id — the durable link between
   # this folder and the conversation, surviving renames.
@@ -125,8 +125,8 @@ if [ -z "${SESSION_ID:-}" ]; then
   exit 1
 fi
 
-# Tab title = folder alias (part before " - <id> - <date>").
-TAB_TITLE="${SCRIPT_DIR##*/}"; TAB_TITLE="${TAB_TITLE%% - *}"
+# Tab title = folder alias = middle segment of "<date> - <alias> - <shortid>".
+TAB_TITLE="${SCRIPT_DIR##*/}"; TAB_TITLE="${TAB_TITLE#* - }"; TAB_TITLE="${TAB_TITLE% - *}"
 
 # Window size: env override > myactivity.config > built-in default.
 [ -f "$PROJECT_ROOT/myactivity.config" ] && . "$PROJECT_ROOT/myactivity.config"
@@ -192,8 +192,9 @@ if [ -z "${PARENT_ID:-}" ]; then
   exit 1
 fi
 
-# Alias of this folder (the child inherits it).
-ALIAS="${SCRIPT_DIR##*/}"; ALIAS="${ALIAS%% - *}"
+# Alias of this folder (middle segment of "<date> - <alias> - <shortid>"); the
+# child inherits it.
+ALIAS="${SCRIPT_DIR##*/}"; ALIAS="${ALIAS#* - }"; ALIAS="${ALIAS% - *}"
 
 # Claude Code's transcript dir for this project (encoding: / -> -).
 PROJ_DIR="$HOME/.claude/projects/$(printf '%s' "$PROJECT_ROOT" | sed 's#/#-#g')"
@@ -207,7 +208,7 @@ fi
 NEW_ID="$(uuidgen | tr 'A-Z' 'a-z')"
 SHORT_ID="${NEW_ID:0:8}"
 DATE="$(date +%d-%m-%Y)"
-FORK_DIR="$SCRIPT_DIR/${ALIAS} - ${SHORT_ID} - ${DATE}"
+FORK_DIR="$SCRIPT_DIR/${DATE} - ${ALIAS} - ${SHORT_ID}"
 mkdir -p "$FORK_DIR"
 touch "$FORK_DIR/$NEW_ID"
 [ -f "$SCRIPT_DIR/resume.sh" ] && cp "$SCRIPT_DIR/resume.sh" "$FORK_DIR/resume.sh" && chmod +x "$FORK_DIR/resume.sh"
@@ -265,16 +266,17 @@ TICKET_NOTE=""
 if [ "${TICKET_ENABLED:-false}" = "true" ]; then
   TICKET_NOTE="
 Ticket convention is ENABLED (prefix: ${TICKET_PREFIX:-<none>}). If this session is
-about resolving a ticket, put the ticket key at the FRONT of the alias
-(e.g. \"${TICKET_PREFIX:-KEY}-1234 <Alias>\"), keeping the \" - <shortid> - <date>\" suffix."
+about resolving a ticket, put the ticket key at the FRONT of the alias segment
+(e.g. \"<dd-mm-yyyy> - ${TICKET_PREFIX:-KEY}-1234 <Alias> - <shortid>\")."
 fi
 
 MSG=$(cat <<EOF
 MyActivity session folder (${STATUS}): ${SESSION_FOLDER}
 
 Follow the my-activity skill for this session:
-1. After the first user message in a NEW session (status=new), rename this folder to prepend a pretty alias (keep it in the SAME parent directory shown below — do not move it to Work/ if it is nested inside the folder of another session):
-     target: ${PARENT_DIR}/<A Pretty Alias> - ${SHORT_ID} - <dd-mm-yyyy>
+1. After the first user message in a NEW session (status=new), rename this folder to INSERT a pretty alias between the date and the id (keep it in the SAME parent directory shown below — do not move it to Work/ if it is nested inside the folder of another session):
+     target: ${PARENT_DIR}/<dd-mm-yyyy> - <A Pretty Alias> - ${SHORT_ID}
+     (keep the dd-mm-yyyy already in the current folder name; just insert the alias)
      A Pretty Alias = 2-5 words from the first user message, Title Case with spaces, human-readable, max 40 chars.
      use: mv "<current_folder>" "<new_folder>"${TICKET_NOTE}
 2. Whenever the user asks you to save a file (script, SQL, note, etc.) without specifying a path, save it inside this folder.

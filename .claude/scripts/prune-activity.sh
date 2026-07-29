@@ -54,11 +54,18 @@ while IFS= read -r dir; do
   [[ "$base" =~ ^[0-9]{4}-[0-9]{2}$ ]] && continue   # skip month buckets
 
   bucket=""; is_today=false
-  if [[ "$base" =~ \ -\ ([0-9]{2})-([0-9]{2})-([0-9]{4})$ ]]; then
+  if [[ "$base" =~ ^([0-9]{2})-([0-9]{2})-([0-9]{4})\  ]]; then
+    # "<dd-mm-yyyy> - <alias> - <shortid>" (current format: date at front)
+    dd="${BASH_REMATCH[1]}"; mm="${BASH_REMATCH[2]}"; yyyy="${BASH_REMATCH[3]}"
+    bucket="${yyyy}-${mm}"
+    [ "${dd}-${mm}-${yyyy}" = "$TODAY_DMY" ] && is_today=true
+  elif [[ "$base" =~ \ -\ ([0-9]{2})-([0-9]{2})-([0-9]{4})$ ]]; then
+    # "<alias> - <shortid> - <dd-mm-yyyy>" (legacy: date at end)
     dd="${BASH_REMATCH[1]}"; mm="${BASH_REMATCH[2]}"; yyyy="${BASH_REMATCH[3]}"
     bucket="${yyyy}-${mm}"
     [ "${dd}-${mm}-${yyyy}" = "$TODAY_DMY" ] && is_today=true
   elif [[ "$base" =~ ^([0-9]{4})-([0-9]{2})-([0-9]{2})_ ]]; then
+    # "yyyy-mm-dd_..." (legacy ISO prefix)
     yyyy="${BASH_REMATCH[1]}"; mm="${BASH_REMATCH[2]}"; dd="${BASH_REMATCH[3]}"
     bucket="${yyyy}-${mm}"
     [ "${yyyy}-${mm}-${dd}" = "$TODAY_YMD" ] && is_today=true

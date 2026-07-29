@@ -13,7 +13,7 @@ skill defines how those folders are named, organized, and reused.
 
 1. **SessionStart hook** (`.claude/hooks/session-start-activity.sh`) runs when a
    session starts.
-   - Creates `MyActivity/Work/<shortid> - <dd-mm-yyyy>/` (no alias yet), where
+   - Creates `MyActivity/Work/<dd-mm-yyyy> - <shortid>/` (no alias yet), where
      `shortid` is the first 8 chars of the session id. It drops a **marker file**
      named after the full session id, plus `resume.sh` and `fork.sh` helpers.
    - **Reuse is by marker file, not folder name.** On start it finds this
@@ -26,9 +26,9 @@ skill defines how those folders are named, organized, and reused.
    - Injects the folder path into context via `additionalContext`.
 
 2. **After the first user message (NEW session only)**, rename the folder in place,
-   prepending a pretty alias:
-   - Pattern: `MyActivity/Work/<A Pretty Alias> - <shortid> - <dd-mm-yyyy>/`
-   - Example: `MyActivity/Work/Wait Time Bots - abc12345 - 27-05-2026/`
+   inserting a pretty alias between the date and the id:
+   - Pattern: `MyActivity/Work/<dd-mm-yyyy> - <A Pretty Alias> - <shortid>/`
+   - Example: `MyActivity/Work/27-05-2026 - Wait Time Bots - abc12345/`
    - Use a single `mv`. Keep it in the **same parent directory** shown in the
      session context (do not move a nested fork out of its parent).
    - **Do not ask** where to put it — new sessions default to `Work/`.
@@ -53,8 +53,8 @@ If the session context says the **ticket convention is enabled** (the SessionSta
 hook injects this, with a prefix, only when the user turned it on in `setup.sh`):
 
 - When a session is about resolving a ticket, put the ticket key at the **front** of
-  the alias: `<TICKET-KEY> <Pretty Alias> - <shortid> - <dd-mm-yyyy>`
-  (e.g. `ACME-1234 Fix Login Bug - abc12345 - 27-05-2026`).
+  the alias segment: `<dd-mm-yyyy> - <TICKET-KEY> <Pretty Alias> - <shortid>`
+  (e.g. `27-05-2026 - ACME-1234 Fix Login Bug - abc12345`).
 - Keep the key uppercase, exactly as the user references it.
 - Apply on the first rename if the first message names/links a ticket; otherwise
   rename in place the moment it becomes clear the session is about a ticket.
@@ -65,8 +65,8 @@ If the context does **not** mention the ticket convention, ignore this entirely.
 ## Rename / relocate
 
 ```bash
-mv "MyActivity/Work/abc12345 - 23-04-2026" \
-   "MyActivity/Work/Refactor Auth Flow - abc12345 - 23-04-2026"
+mv "MyActivity/Work/23-04-2026 - abc12345" \
+   "MyActivity/Work/23-04-2026 - Refactor Auth Flow - abc12345"
 ```
 
 - Promote a session to a reusable **agent**: move its folder to the `MyActivity/`

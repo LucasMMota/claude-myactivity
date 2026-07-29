@@ -148,15 +148,15 @@ MyActivity/
 ├── Data Onboarding Agent/                 # a "root agent": a promoted, reusable session
 │   ├── 9f8e7d6c-…                          # marker: full session id (empty file)
 │   ├── resume.sh · fork.sh
-│   └── Explore Schema - 3c4d5e6f - 24-07-2026/   # a fork nested inside the agent
+│   └── 24-07-2026 - Explore Schema - 3c4d5e6f/   # a fork nested inside the agent
 │       └── 3c4d5e6f-… · resume.sh · fork.sh
 ├── Work/                                   # day-to-day sessions
-│   ├── Fix Login Bug - a1b2c3d4 - 24-07-2026/    # today → stays loose
+│   ├── 24-07-2026 - Fix Login Bug - a1b2c3d4/    # today → stays loose
 │   │   ├── a1b2c3d4-…                       # marker
 │   │   ├── resume.sh · fork.sh
 │   │   └── repro.md                         # ← an artifact you saved this session
 │   └── 2026-06/                             # monthly archive bucket
-│       └── Migrate API - 7a8b9c0d - 12-06-2026/ …
+│       └── 12-06-2026 - Migrate API - 7a8b9c0d/ …
 ```
 
 | Item | What it is |
